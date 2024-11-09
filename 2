@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.28;
+
+contract ControlStructures {
+    // Пользовательская ошибка для случаев, когда время вне рабочих часов
+    error AfterHours(uint256 time);
+
+    // Функция FizzBuzz
+    function fizzBuzz(uint256 _number) public pure returns (string memory) {
+        // Проверка делимости числа на 3 и 5
+        if (_number % 3 == 0 && _number % 5 == 0) {
+            return "FizzBuzz"; // Возвращает "FizzBuzz" при делимости на 3 и 5
+        } 
+        else if (_number % 3 == 0) {
+            return "Fizz"; // Возвращает "Fizz" при делимости на 3
+        } 
+        else if (_number % 5 == 0) {
+            return "Buzz"; // Возвращает "Buzz" при делимости на 5
+        } 
+        else {
+            return "Splat"; // Возвращает "Splat" если нет условий
+        }
+    }
+
+    // Функция Do Not Disturb
+    function doNotDisturb(uint256 _time) public pure returns (string memory) {
+        // Используем assert для проверки, что время меньше 2400
+        assert(_time < 2400);
+
+        // Проверка различных временных диапазонов и возвращение ответа
+        if (_time > 2200 || _time < 800) {
+            revert AfterHours(_time); // Ошибка, если время после 22:00 или до 8:00
+        } 
+        else if (_time >= 1200 && _time <= 1259) {
+            revert("At lunch!"); // Выводит сообщение, если время с 12:00 до 12:59
+        } 
+        else if (_time >= 800 && _time <= 1199) {
+            return "Morning!"; // Возвращает "Morning!" с 8:00 до 11:59
+        } 
+        else if (_time >= 1300 && _time <= 1799) {
+            return "Afternoon!"; // Возвращает "Afternoon!" с 13:00 до 17:59
+        } 
+        else if (_time >= 1800 && _time <= 2200) {
+            return "Evening!"; // Возвращает "Evening!" с 18:00 до 22:00
+        }
+    }
+}

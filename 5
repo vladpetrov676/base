@@ -1,0 +1,77 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+/**
+ * @title FavoriteRecords
+ * @dev Контракт для управления списком одобренных музыкальных записей и добавления их пользователями в избранное
+ */
+contract FavoriteRecords {
+    mapping(string => bool) private isApprovedRecord;
+    string[] private approvedRecordList;
+
+    mapping(address => mapping(string => bool)) public userFavoriteRecords;
+    mapping(address => string[]) private userFavoriteList;
+
+    error RecordNotApproved(string albumName);
+
+    /**
+     * @dev Конструктор, инициализирующий список одобренных записей
+     */
+    constructor() {
+        approvedRecordList = [
+            "Thriller",
+            "Back in Black",
+            "The Bodyguard",
+            "The Dark Side of the Moon",
+            "Their Greatest Hits (1971-1975)",
+            "Hotel California",
+            "Come On Over",
+            "Rumours",
+            "Saturday Night Fever"
+        ];
+        for (uint i = 0; i < approvedRecordList.length; i++) {
+            isApprovedRecord[approvedRecordList[i]] = true;
+        }
+    }
+
+    /**
+     * @dev Возвращает список одобренных записей
+     * @return Массив с названиями одобренных записей
+     */
+    function getApprovedRecords() public view returns (string[] memory) {
+        return approvedRecordList;
+    }
+
+    /**
+     * @dev Добавляет одобренную запись в избранное пользователя
+     * @param albumName Название альбома для добавления
+     */
+    function addRecord(string memory albumName) public {
+        if (!isApprovedRecord[albumName]) {
+            revert RecordNotApproved({albumName: albumName});
+        }
+        if (!userFavoriteRecords[msg.sender][albumName]) {
+            userFavoriteRecords[msg.sender][albumName] = true;
+            userFavoriteList[msg.sender].push(albumName);
+        }
+    }
+
+    /**
+     * @dev Возвращает список избранных записей пользователя
+     * @param user Адрес пользователя
+     * @return Массив с названиями избранных записей пользователя
+     */
+    function getUserFavorites(address user) public view returns (string[] memory) {
+        return userFavoriteList[user];
+    }
+
+    /**
+     * @dev Сбрасывает список избранных записей вызывающего
+     */
+    function resetUserFavorites() public {
+        for (uint i = 0; i < userFavoriteList[msg.sender].length; i++) {
+            delete userFavoriteRecords[msg.sender][userFavoriteList[msg.sender][i]];
+        }
+        delete userFavoriteList[msg.sender];
+    }
+}
